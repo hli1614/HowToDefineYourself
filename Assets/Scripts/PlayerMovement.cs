@@ -6,6 +6,11 @@ public class PlayerMovement : MonoBehaviour
     public float moveSpeed = 5f;
     // 引用 Player 身上的 Rigidbody2D 组件，用来控制移动
     private Rigidbody2D rb;
+
+    //玩家最后一次移动的方向
+    //Vector2.right 表示向右，也就是（1，0）
+    public Vector2 lastMoveDirection = Vector2.right;
+    
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -17,10 +22,20 @@ public class PlayerMovement : MonoBehaviour
     {
         // 读取左右方向输入：A/D 或左/右方向键
         float horizontalInput = Input.GetAxisRaw("Horizontal");
+
         // 读取上下方向输入：W/S 或上/下方向键
         float verticalInput = Input.GetAxisRaw("Vertical");
+
         //把水平和垂直合并成一个二维方向
         Vector2 movementInput = new Vector2(horizontalInput, verticalInput);
+
+        //如果玩家正在移动，就记录当前移动方向
+        if(movementInput != Vector2.zero)
+        {
+            //把方向转换成长度为1的单位方向
+            lastMoveDirection = movementInput.normalized; 
+        }
+
         //根据输入方向和移动速度设置玩家移动速度
         rb.linearVelocity = movementInput * moveSpeed;
 
