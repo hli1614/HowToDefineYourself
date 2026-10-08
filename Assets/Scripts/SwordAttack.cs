@@ -8,6 +8,10 @@ public class SwordAttack : MonoBehaviour
     //攻击剩余时间
     private float attackTimer;
 
+    //挥剑开始和结束的角度
+    private float swingStartAngle = -70f;
+    private float swingEndAngle = 70f;
+
     //剑的图片组件
     private SpriteRenderer swordRenderere;
 
@@ -15,7 +19,11 @@ public class SwordAttack : MonoBehaviour
     private BoxCollider2D swordCollider;
 
     //获取玩家的移动脚本
-    private PlayerMovement playerMovement;
+    //private PlayerMovement playerMovement;
+
+    //获取SwordPivot旋转中心
+    private Transform swordPivot;
+
 
     void SetAttackActive(bool active)
     {
@@ -27,16 +35,17 @@ public class SwordAttack : MonoBehaviour
     }
 
     //根据玩家最后的移动方向旋转剑
-    private void UpdateSwordDirection()
-    {
-        //把二维方向转化成角度
-        float angle = Mathf.Atan2(
-            playerMovement.lastMoveDirection.y,
-            playerMovement.lastMoveDirection.x) * Mathf.Rad2Deg;
+    //private void UpdateSwordDirection()
+    //{
+    //    // 把二维方向转换成角度
+    //    float angle = Mathf.Atan2(
+    //        playerMovement.lastMoveDirection.y,
+    //        playerMovement.lastMoveDirection.x
+    //    ) * Mathf.Rad2Deg;
 
-        //让剑按照这个角度旋转
-        transform.localRotation = Quaternion.Euler(0, 0, angle);
-    }
+    //    // 让剑按照这个角度旋转
+    //    transform.localRotation = Quaternion.Euler(0, 0, angle);
+    //}
 
 
     void Start()
@@ -46,7 +55,10 @@ public class SwordAttack : MonoBehaviour
         swordCollider = GetComponent<BoxCollider2D>();
 
         //获取父级物品Player身上的playerMovement脚本
-        playerMovement = GetComponentInParent<PlayerMovement>();
+        //playerMovement = GetComponentInParent<PlayerMovement>();
+
+        //获取Sword的父物体SwordPivot
+        swordPivot = transform.parent;
 
         //游戏开始时隐藏剑和攻击范围
         SetAttackActive(false);
@@ -55,12 +67,16 @@ public class SwordAttack : MonoBehaviour
     private void Update()
     {
         //根据玩家最后移动方向改变剑的朝向
-        UpdateSwordDirection();
+        //UpdateSwordDirection();
 
         //鼠标按下左键，如果没有攻击时，开始攻击
         if (Input.GetMouseButtonDown(0) && attackTimer <= 0) 
         {
             attackTimer = attackDuration;
+
+            //把剑放到挥剑开始的地方
+            swordPivot.localRotation = Quaternion.Euler(0, 0, swingStartAngle);
+
             SetAttackActive(true);
         }
 
@@ -69,11 +85,36 @@ public class SwordAttack : MonoBehaviour
         {
             attackTimer -= Time.deltaTime;
 
+            //计算挥剑进度，范围是0到1
+            float swingProgress = 1f - attackTimer / attackDuration;
+
+            //根据进度计算当前剑的角度
+            float swingAngle = Mathf.Lerp(swingStartAngle,swingEndAngle, swingProgress);
+
+            //旋转SwordPivot，让剑完成挥砍
+            swordPivot.localRotation = Quaternion.Euler(0, 0, swingAngle);
+
             //时间结束后隐藏剑
             if (attackTimer <= 0)
             {
+                //将剑恢复到玩家当前的面向方向
+                swordPivot.localRotation = Quaternion.identity;
+
                 SetAttackActive(false);
             }
+        }
+    }
+    //当剑的攻击碰撞器碰到其他碰撞器时调用
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        //尝试获取被击中物体上的EnemyHealth脚本
+        EnemyHealth enemyHealth = other.GetComponent<EnemyHealth>();
+
+        //如果被击中的物体确实有EnemyHealth脚本
+        if(enemyHealth != null)
+        {
+            // 对敌人造成1点伤害
+            enemyHealth.TakeDamage(1);
         }
     }
 }
