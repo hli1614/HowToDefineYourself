@@ -2,6 +2,7 @@ using UnityEngine;
 using TMPro;
 
 using System.Data;
+using Unity.VisualScripting;
 public class PlayerHealth : MonoBehaviour
 {
     //玩家最大生命值
@@ -19,8 +20,21 @@ public class PlayerHealth : MonoBehaviour
     //游戏界面上显示生命值和护盾的文字
     public TextMeshProUGUI playerStatusText;
 
+    //玩家死亡时显示游戏结束文字
+    public TextMeshProUGUI gmaeOverText;
+
+    //玩家死亡后就显示重新开始按钮
+    public GameObject restartButton;
+
+    //游戏开始时隐藏重新开始按钮
+    
+    
+
+
+
+
     //更新游戏界面上的生命值和护盾文字
-    private void UpdateStatusText()
+     private void UpdateStatusText()
     {
         //确认已经连接了UI文字
         if(playerStatusText != null)
@@ -38,12 +52,43 @@ public class PlayerHealth : MonoBehaviour
 
         //显示初始生命值和护盾值
         UpdateStatusText();
+
+        //确保游戏开始时正常运行
+        Time.timeScale = 1f;
+
+        //游戏开始时隐藏游戏结束文字
+        if(gmaeOverText != null)
+        {
+            gmaeOverText.gameObject.SetActive(false);
+        }
+
+        //游戏开始时隐藏重新开始按钮
+        if(restartButton != null )
+        {
+            restartButton.SetActive(false);
+        }
     }
 
     //玩家死亡的方法
     private void Die()
     {
         Debug.Log("You have been reset.");
+
+        //如果已经连接游戏结束文字，就显示它
+        if(gmaeOverText != null)
+        {
+            gmaeOverText.text = "You have been reset.";
+            gmaeOverText.gameObject.SetActive(true);
+        }
+        if(restartButton != null)
+        {
+            restartButton.SetActive(true);
+        }
+
+
+        //将游戏时间速度设为0，让整个游戏暂停
+        Time.timeScale = 0f;
+
     }
 
     //玩家受到伤害

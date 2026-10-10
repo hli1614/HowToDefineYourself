@@ -19,7 +19,20 @@ public class EnemyFollow : MonoBehaviour
         // 如果没有手动设置目标，就自动寻找Player
         if(target == null)
         {
+            //寻找名字为Player的游戏对象
             GameObject playerObject = GameObject.Find("Player");
+
+            //确认找到了Player
+            if(playerObject != null)
+            {
+                // 把Player的Transform设置为追踪目标
+                target = playerObject.transform;
+            }
+            else
+            {
+                //如果没有找到Player，就在Console中显示警告
+                Debug.LogWarning("Not find player");
+            }
         }
     }
     void FixedUpdate()

@@ -24,6 +24,9 @@ public class SwordAttack : MonoBehaviour
     //获取SwordPivot旋转中心
     private Transform swordPivot;
 
+    //剑的声音组件
+    private AudioSource swordAudio;
+
 
     void SetAttackActive(bool active)
     {
@@ -54,6 +57,7 @@ public class SwordAttack : MonoBehaviour
         swordRenderere = GetComponent<SpriteRenderer>();
         swordCollider = GetComponent<BoxCollider2D>();
 
+        swordAudio = GetComponent<AudioSource>();
         //获取父级物品Player身上的playerMovement脚本
         //playerMovement = GetComponentInParent<PlayerMovement>();
 
@@ -78,6 +82,12 @@ public class SwordAttack : MonoBehaviour
             swordPivot.localRotation = Quaternion.Euler(0, 0, swingStartAngle);
 
             SetAttackActive(true);
+
+            //播放挥剑声音
+            if(swordAudio != null)
+            {
+                swordAudio.Play();
+            }
         }
 
         //攻击持续倒计时

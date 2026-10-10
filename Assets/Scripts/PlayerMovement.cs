@@ -27,7 +27,7 @@ public class PlayerMovement : MonoBehaviour
         float snappedAngle = Mathf.Round(angle / 45f) * 45f;
 
         //旋转玩家
-        transform.rotation = Quaternion.Euler(0, 0, snappedAngle);
+        transform.rotation = Quaternion.Euler(0, 0, snappedAngle+90f);
     }
     
     // Start is called once before the first execution of Update after the MonoBehaviour is created
